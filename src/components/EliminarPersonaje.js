@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
-import { deletePersonaje } from '../api';
+import React, { useState, useEffect } from 'react';
+import { deletePersonaje, getAllPersonajes } from '../api';
 
 function EliminarPersonaje() {
     const [idEliminar, setIdEliminar] = useState('');
     const [mensaje, setMensaje] = useState('');
     const [error, setError] = useState(null);
+    const [personajes, setPersonajes] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     const handleChange = (e) => {
         setIdEliminar(e.target.value);
@@ -17,11 +19,28 @@ function EliminarPersonaje() {
             setMensaje(response.message);
             setError(null);
             setIdEliminar('');
+            fetchPersonajes(); // Actualizar lista tras eliminar
         } catch (error) {
             setError(error.message);
             setMensaje('');
         }
     };
+
+    const fetchPersonajes = async () => {
+        setLoading(true);
+        try {
+            const data = await getAllPersonajes();
+            setPersonajes(data);
+            setLoading(false);
+        } catch (error) {
+            setError(error.message);
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchPersonajes();
+    }, []);
 
     return (
         <div>
@@ -35,6 +54,23 @@ function EliminarPersonaje() {
             </form>
             {mensaje && <p style={{ color: 'green' }}>{mensaje}</p>}
             {error && <p style={{ color: 'red' }}>Error: {error}</p>}
+
+            <hr />
+
+            <h2>Lista de Personajes</h2>
+            {loading ? (
+                <p>Cargando personajes...</p>
+            ) : personajes.length > 0 ? (
+                <ul>
+                    {personajes.map(personaje => (
+                        <li key={personaje.id}>
+                            ID: {personaje.id}, Nombre: {personaje.name}, Email: {personaje.email}, Whatsapp: {personaje.whatsapp}
+                        </li>
+                    ))}
+                </ul>
+            ) : (
+                <p>No hay personajes registrados.</p>
+            )}
         </div>
     );
 }
