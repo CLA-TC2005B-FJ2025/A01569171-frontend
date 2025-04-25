@@ -55,7 +55,7 @@ function EliminarPersonaje() {
             {mensaje && <p style={{ color: 'green' }}>{mensaje}</p>}
             {error && <p style={{ color: 'red' }}>Error: {error}</p>}
 
-            <hr />
+            <div></div>
 
             <h2>Lista de Personajes</h2>
             {loading ? (
